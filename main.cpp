@@ -161,7 +161,6 @@ int test_jacobian_point(void) {
 
 
     jacobian_point_copy(G, &SM2_G);
-    base_print("Gz:", G->Z);
     ok = jacobian_point_equ_hex(G, hex_G);
     printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//1
     if (!ok) return -1;
@@ -191,18 +190,9 @@ int test_jacobian_point(void) {
     if (!ok) return -1;
 
     base_set_word(k, 10);
-    cout << "********" << endl;
-    base_print("K:", k);
-    base_print("G:", G->X);
-    base_print("G:", G->Y);
-    base_print("G:", G->Z);
+    //神奇，这个换行删掉居然会报个小错，说_G越界
+    cout << "" << endl;
 
-
-//    jacobian_point_dbl(P, G);
-//    jacobian_point_add(P, P, G);
-//    jacobian_point_add(P, P, G);
-//    jacobian_point_add(P, P, G);
-//    jacobian_point_dbl(P, P);
     jacobian_point_mul(P, k, G);
 
     ok = jacobian_point_equ_hex(P, hex_10G);

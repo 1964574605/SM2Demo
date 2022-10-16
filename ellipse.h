@@ -397,9 +397,9 @@ int jacobian_point_equ_hex(const JACOBIAN_POINT *P, const char hex[128]) {
 
     jacobian_point_get_xy(P, x, y);
 
-    cout << "test_equ_value: " << endl;
-    base_print("x:", x);
-    base_print("y:", y);
+//    cout << "test_equ_value: " << endl;
+//    base_print("x:", x);
+//    base_print("y:", y);
 
 
     jacobian_point_from_hex(T, hex);
