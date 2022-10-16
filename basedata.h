@@ -108,7 +108,7 @@ void base_to_hex(const base a, char hex[64]) {
 void base_print(const char *prefix, const base a) {
     char hex[65] = {0};
     base_to_hex(a, hex);
-    printf("%s\n%s\n", prefix, hex);
+    printf("%s%s\n", prefix, hex);
 }
 
 void base_to_bits(const base a, char bits[256]) {

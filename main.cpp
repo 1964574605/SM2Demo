@@ -43,14 +43,77 @@ void test3() {
 
 void test2() {
     cout << "------------------------test2Begin----------------------" << endl;
-    uint8_t plaintext[] = "Hello World!";
-    cout << sizeof(plaintext) << endl;
+    base SM2_P = {
+            0xffffffff, 0xffffffff, 0x00000000, 0xffffffff,
+            0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
+    };//大素数
+    base SM2_A = {0, 0, 0, 0, 0, 0, 0, 0};
+    base SM2_B = {
+            0x4d940e93, 0xddbcbd41, 0x15ab8f92, 0xf39789f5,
+            0xcf6509a7, 0x4d5a9e4b, 0x9d9f5e34, 0x28e9fa9e,
+    };//椭圆曲线的参数B
+    base Gx = {//基点G
+            0x334c74c7, 0x715a4589, 0xf2660be1, 0x8fe30bbf,
+            0x6a39c994, 0x5f990446, 0x1f198119, 0x32c4ae2c,
+    };
+    base Gy = {//基点G
+            0x2139f0a0, 0x02df32e5, 0xc62a4740, 0xd0a9877c,
+            0x6b692153, 0x59bdcee3, 0xf4f6779c, 0xbc3736a2,
+    };
+    coordinate SM2_G(Gx, Gy);
+    base SM2_N = {
+            0x39d54123, 0x53bbf409, 0x21c6052b, 0x7203df6b,
+            0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
+    };
+    SM2_G.print();
+    coordinate doubleTest;
+    doubleTest = SM2_G.selfDouble(SM2_A, SM2_P);
+    doubleTest.print();
 
-    uint8_t buf[64];
-
-//    sm2_kdf(buf, sizeof(buf), sizeof(plaintext), plaintext);
 
     cout << "------------------------test2Ending----------------------" << endl;
+}
+
+void test4() {
+    cout << "------------------------test4Begin----------------------" << endl;
+    base SM2_P = {
+            0xffffffff, 0xffffffff, 0x00000000, 0xffffffff,
+            0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
+    };//大素数
+    base SM2_A = {0, 0, 0, 0, 0, 0, 0, 0};
+    base SM2_B = {
+            0x4d940e93, 0xddbcbd41, 0x15ab8f92, 0xf39789f5,
+            0xcf6509a7, 0x4d5a9e4b, 0x9d9f5e34, 0x28e9fa9e,
+    };//椭圆曲线的参数B
+    base Gx = {//基点G
+            0x334c74c7, 0x715a4589, 0xf2660be1, 0x8fe30bbf,
+            0x6a39c994, 0x5f990446, 0x1f198119, 0x32c4ae2c,
+    };
+    base Gy = {//基点G
+            0x2139f0a0, 0x02df32e5, 0xc62a4740, 0xd0a9877c,
+            0x6b692153, 0x59bdcee3, 0xf4f6779c, 0xbc3736a2,
+    };
+    coordinate SM2_G(Gx, Gy);
+
+    base _Gy;
+    base_sub_mod(_Gy, BASE_ZERO, Gy, SM2_P);
+    coordinate SM2_G_neg(Gx, _Gy);
+    cout << "neg:" << endl;
+    SM2_G_neg.print();
+
+    base SM2_N = {
+            0x39d54123, 0x53bbf409, 0x21c6052b, 0x7203df6b,
+            0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
+    };
+    SM2_G.print();
+    coordinate doubleTest;
+    doubleTest = SM2_G.selfDouble(SM2_A, SM2_P);
+    doubleTest.print();
+    doubleTest = doubleTest.add(SM2_G_neg, SM2_A, SM2_P);
+    doubleTest.print();
+
+
+    cout << "------------------------test4Ending----------------------" << endl;
 }
 
 int main() {
@@ -156,8 +219,7 @@ int main() {
     return 0;
 }
 
-
 int main1() {
-    test2();
+    test4();
     return 0;
 }

@@ -64,10 +64,14 @@ coordinate coordinate::selfDouble(base a, base p) {
     }
 
     base k;//斜率
-    // P=Q 则 k=(3 * x_2 + a) / 2 * y_1  (mod p)
+    // P=Q 则 k=(3 * x_1^2 + a) / (2 * y_1)  (mod p)
     base molecular;//分子
-    base_mul_modn(molecular, BASE_THREE, x, p);
+    base_mul_modn(molecular, x, x, p);
+    base_mul_modn(molecular, BASE_THREE, molecular, p);
+    base_print("---a:", a);
+    base_print("----mole:", molecular);
     base_add_modn(molecular, molecular, a, p);
+    base_print("----mole:", molecular);
 
     base denominator, denominator_inv;//分母
     base_mul_modn(denominator, BASE_TWO, y, p);
@@ -75,19 +79,18 @@ coordinate coordinate::selfDouble(base a, base p) {
 
     base_mul_modn(k, molecular, denominator_inv, p);
 
-
     base temp;
     base x_mul2;
-    base_mul_modn(temp, k, k, p);
-    base_add_modn(x_mul2, x, x, p);
+    base_mul_modn(temp, k, k, p);//k^2
+    base_add_modn(x_mul2, x, x, p);//2x
 
-
+    base_print("---x:", x);
     coordinate new_co;
-    base_sub_mod(new_co.x, temp, x_mul2, p);
-    base x1_x3;
-    base_sub_mod(x1_x3, x, new_co.x, p);
-    base_mul_modn(new_co.y, k, x1_x3, p);
-    base_sub_mod(new_co.y, new_co.y, y, p);
+    base_sub_mod(new_co.x, temp, x_mul2, p);//k^2-2x
+    base x1_x3;//x1-x3
+    base_sub_mod(x1_x3, x, new_co.x, p);//x1-x3
+    base_mul_modn(new_co.y, k, x1_x3, p);//k(x1-x3)
+    base_sub_mod(new_co.y, new_co.y, y, p);//k(x1-x3)-y1
 
 
     return new_co;
