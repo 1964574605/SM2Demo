@@ -38,6 +38,7 @@ static int hexchar2int(char c) {
 #define base_is_zero(a)    (base_cmp((a), BASE_ZERO) == 0)
 #define base_is_one(a)    (base_cmp((a), BASE_ONE) == 0)
 
+
 const base BASE_ZERO = {0, 0, 0, 0, 0, 0, 0, 0};
 const base BASE_ONE = {1, 0, 0, 0, 0, 0, 0, 0};
 static const base BASE_TWO = {2, 0, 0, 0, 0, 0, 0, 0};
@@ -486,10 +487,10 @@ void base_mul_inv(base result, const base a, const base mod) {
 }
 
 void base_add_modn(base r, const base a, const base b, const base n) {
-    base res;
-    base_add(res, a, b);
-    base_format(res, 8);
-    base_mod(r, res, n);
+    base_add(r, a, b);
+    if (base_cmp(r, n) >= 0) {
+        base_sub(r, r, n);
+    }
 }
 
 #endif

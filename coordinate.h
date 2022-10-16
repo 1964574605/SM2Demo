@@ -5,9 +5,9 @@
 #ifndef SM2DEMO_COORDINATE_H
 #define SM2DEMO_COORDINATE_H
 
-#endif //SM2DEMO_COORDINATE_H
 
 #include "basedata.h"
+
 
 struct coordinate {
     //coordinate:坐标
@@ -160,3 +160,5 @@ void coordinate::print() {
     base_print("x:", x);
     base_print("y:", y);
 }
+
+#endif //SM2DEMO_COORDINATE_H

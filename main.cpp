@@ -2,8 +2,10 @@
 #include "basedata.h"
 #include "tool.h"
 #include "coordinate.h"
+#include "ellipse.h"
 
 using namespace std;
+
 
 void test1(coordinate co, base a, base p) {
     cout << "------------------------test1Begin----------------------" << endl;
@@ -43,12 +45,12 @@ void test3() {
 
 void test2() {
     cout << "------------------------test2Begin----------------------" << endl;
-    base SM2_P = {
+    base P = {
             0xffffffff, 0xffffffff, 0x00000000, 0xffffffff,
             0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
     };//大素数
-    base SM2_A = {0, 0, 0, 0, 0, 0, 0, 0};
-    base SM2_B = {
+    base A = {0, 0, 0, 0, 0, 0, 0, 0};
+    base B = {
             0x4d940e93, 0xddbcbd41, 0x15ab8f92, 0xf39789f5,
             0xcf6509a7, 0x4d5a9e4b, 0x9d9f5e34, 0x28e9fa9e,
     };//椭圆曲线的参数B
@@ -60,14 +62,14 @@ void test2() {
             0x2139f0a0, 0x02df32e5, 0xc62a4740, 0xd0a9877c,
             0x6b692153, 0x59bdcee3, 0xf4f6779c, 0xbc3736a2,
     };
-    coordinate SM2_G(Gx, Gy);
-    base SM2_N = {
+    coordinate G(Gx, Gy);
+    base N = {
             0x39d54123, 0x53bbf409, 0x21c6052b, 0x7203df6b,
             0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
     };
-    SM2_G.print();
+    G.print();
     coordinate doubleTest;
-    doubleTest = SM2_G.selfDouble(SM2_A, SM2_P);
+    doubleTest = G.selfDouble(A, P);
     doubleTest.print();
 
 
@@ -76,12 +78,12 @@ void test2() {
 
 void test4() {
     cout << "------------------------test4Begin----------------------" << endl;
-    base SM2_P = {
+    base P = {
             0xffffffff, 0xffffffff, 0x00000000, 0xffffffff,
             0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
     };//大素数
-    base SM2_A = {0, 0, 0, 0, 0, 0, 0, 0};
-    base SM2_B = {
+    base A = {0, 0, 0, 0, 0, 0, 0, 0};
+    base B = {
             0x4d940e93, 0xddbcbd41, 0x15ab8f92, 0xf39789f5,
             0xcf6509a7, 0x4d5a9e4b, 0x9d9f5e34, 0x28e9fa9e,
     };//椭圆曲线的参数B
@@ -93,30 +95,132 @@ void test4() {
             0x2139f0a0, 0x02df32e5, 0xc62a4740, 0xd0a9877c,
             0x6b692153, 0x59bdcee3, 0xf4f6779c, 0xbc3736a2,
     };
-    coordinate SM2_G(Gx, Gy);
+    coordinate G(Gx, Gy);
 
     base _Gy;
-    base_sub_mod(_Gy, BASE_ZERO, Gy, SM2_P);
-    coordinate SM2_G_neg(Gx, _Gy);
+    base_sub_mod(_Gy, BASE_ZERO, Gy, P);
+    coordinate G_neg(Gx, _Gy);
     cout << "neg:" << endl;
-    SM2_G_neg.print();
+    G_neg.print();
 
-    base SM2_N = {
+    base N = {
             0x39d54123, 0x53bbf409, 0x21c6052b, 0x7203df6b,
             0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
     };
-    SM2_G.print();
+    G.print();
     coordinate doubleTest;
-    doubleTest = SM2_G.selfDouble(SM2_A, SM2_P);
+    doubleTest = G.selfDouble(A, P);
     doubleTest.print();
-    doubleTest = doubleTest.add(SM2_G_neg, SM2_A, SM2_P);
+    doubleTest = doubleTest.add(G_neg, A, P);
     doubleTest.print();
 
 
     cout << "------------------------test4Ending----------------------" << endl;
 }
 
-int main() {
+#define hex_G \
+    "32c4ae2c1f1981195f9904466a39c9948fe30bbff2660be1715a4589334c74c7" \
+    "bc3736a2f4f6779c59bdcee36b692153d0a9877cc62a474002df32e52139f0a0"
+#define hex_2G \
+    "56cefd60d7c87c000d58ef57fa73ba4d9c0dfa08c08a7331495c2e1da3f2bd52" \
+    "31b7e7e6cc8189f668535ce0f8eaf1bd6de84c182f6c8e716f780d3a970a23c3"
+#define hex_3G \
+    "a97f7cd4b3c993b4be2daa8cdb41e24ca13f6bd945302244e26918f1d0509ebf" \
+    "530b5dd88c688ef5ccc5cec08a72150f7c400ee5cd045292aaacdd037458f6e6"
+#define hex_negG \
+    "32c4ae2c1f1981195f9904466a39c9948fe30bbff2660be1715a4589334c74c7" \
+    "43c8c95c0b098863a642311c9496deac2f56788239d5b8c0fd20cd1adec60f5f"
+#define hex_10G \
+    "d3f94862519621c121666061f65c3e32b2d0d065cd219e3284a04814db522756" \
+    "4b9030cf676f6a742ebd57d146dca428f6b743f64d1482d147d46fb2bab82a14"
+#define hex_bG \
+    "528470bc74a6ebc663c06fc4cfa1b630d1e9d4a80c0a127b47f73c324c46c0ba" \
+    "832cf9c5a15b997e60962b4cf6e2c9cee488faaec98d20599d323d4cabfc1bf4"
+
+#define hex_P \
+    "504cfe2fae749d645e99fbb5b25995cc6fed70196007b039bdc44706bdabc0d9" \
+    "b80a8018eda5f55ddc4b870d7784b7b84e53af02f575ab53ed8a99a3bbe2abc2"
+#define hex_2P \
+    "a53d20e89312b5243f66aec12ef6471f5911941d86302d5d8337cb70937d65ae" \
+    "96953c46815e4259363256ddd6c77fcc33787aeafc6a57beec5833f476dd69e0"
+
+#define hex_tP \
+    "02deff2c5b3656ca3f7c7ca9d710ca1d69860c75a9c7ec284b96b8adc50b2936" \
+    "b74bcba937e9267fce4ccc069a6681f5b04dcedd9e2794c6a25ddc7856df7145"
+
+
+int test_jacobian_point(void) {
+    JACOBIAN_POINT _P, *P = &_P;
+    JACOBIAN_POINT _G, *G = &_G;
+    base k;
+    int i = 1, ok;
+
+    uint8_t buf[64];
+
+    printf("jacobian_point_test\n");
+
+
+    jacobian_point_copy(G, &SM2_G);
+    base_print("Gz:", G->Z);
+    ok = jacobian_point_equ_hex(G, hex_G);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//1
+    if (!ok) return -1;
+
+    ok = jacobian_point_is_on_curve(G);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//2
+    if (!ok) return -1;
+
+    jacobian_point_dbl(P, G);
+    ok = jacobian_point_equ_hex(P, hex_2G);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//3
+    if (!ok) return -1;
+
+    jacobian_point_add(P, P, G);
+    ok = jacobian_point_equ_hex(P, hex_3G);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//4
+    if (!ok) return -1;
+
+    jacobian_point_sub(P, P, G);
+    ok = jacobian_point_equ_hex(P, hex_2G);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//5
+    if (!ok) return -1;
+
+    jacobian_point_neg(P, G);
+    ok = jacobian_point_equ_hex(P, hex_negG);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//6
+    if (!ok) return -1;
+
+    base_set_word(k, 10);
+    cout << "********" << endl;
+    base_print("K:", k);
+    base_print("G:", G->X);
+    base_print("G:", G->Y);
+    base_print("G:", G->Z);
+
+
+//    jacobian_point_dbl(P, G);
+//    jacobian_point_add(P, P, G);
+//    jacobian_point_add(P, P, G);
+//    jacobian_point_add(P, P, G);
+//    jacobian_point_dbl(P, P);
+    jacobian_point_mul(P, k, G);
+
+    ok = jacobian_point_equ_hex(P, hex_10G);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//7
+    if (!ok) return -1;
+
+    jacobian_point_mul_generator(P, B);
+    ok = jacobian_point_equ_hex(P, hex_bG);
+    printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//8
+    if (!ok) return -1;
+
+    jacobian_point_to_bytes(P, buf);
+    jacobian_point_from_hex(P, hex_P);
+
+    return 1;
+}
+
+int main1() {
     /** 以下参数都使用国密局《SM2椭圆曲线公钥密码算法第4部分:公钥加密算法》中示例1：Fp-256的数据，以便对比 **/
     //p:大质数,范围被限定在2^256内
     char p[] = "8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3";
@@ -219,7 +323,7 @@ int main() {
     return 0;
 }
 
-int main1() {
-    test4();
+int main() {
+    test_jacobian_point();
     return 0;
 }
