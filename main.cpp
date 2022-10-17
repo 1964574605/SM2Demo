@@ -3,6 +3,11 @@
 #include "tool.h"
 #include "coordinate.h"
 #include "ellipse.h"
+#include "key.h"
+#include "ciphertext.h"
+
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
 
@@ -149,7 +154,7 @@ void test4() {
     "b74bcba937e9267fce4ccc069a6681f5b04dcedd9e2794c6a25ddc7856df7145"
 
 
-int test_jacobian_point(void) {
+int test_jacobian_point() {
     JACOBIAN_POINT _P, *P = &_P;
     JACOBIAN_POINT _G, *G = &_G;
     base k;
@@ -190,10 +195,10 @@ int test_jacobian_point(void) {
     if (!ok) return -1;
 
     base_set_word(k, 10);
-    //神奇，这个换行删掉居然会报个小错，说_G越界
-    cout << "" << endl;
+//    神奇，这个换行删掉居然会报个小错，说_G越界
+//    cout << "" << endl;
 
-    jacobian_point_mul(P, k, G);
+    jacobian_point_mul(P, k, &SM2_G);
 
     ok = jacobian_point_equ_hex(P, hex_10G);
     printf("sm2 point test %d %s\n", i++, ok ? "ok" : "failed");//7
@@ -207,6 +212,34 @@ int test_jacobian_point(void) {
     jacobian_point_to_bytes(P, buf);
     jacobian_point_from_hex(P, hex_P);
 
+    return 1;
+}
+
+int test_sm2_do_encrypt() {
+    SM2_KEY sm2_key;
+    uint8_t plaintext[] = "Hello World!";
+    SM2_CIPHERTEXT ciphertext;
+
+    uint8_t plainbuf[SM2_MAX_PLAINTEXT_SIZE] = {0};
+    size_t plainlen = 0;
+    int r = 0;
+
+    if (sm2_key_generate(&sm2_key) != 1) {
+        return -1;
+    } else { cout << "key generate success" << endl; }
+
+
+    if (sm2_do_encrypt(&sm2_key, plaintext, sizeof(plaintext), &ciphertext) != 1
+        || sm2_do_decrypt(&sm2_key, &ciphertext, plainbuf, &plainlen) != 1) {
+        return -1;
+    } else { cout << "encrypt and decrypt success" << endl; }
+
+    if (plainlen != sizeof(plaintext)
+        || memcmp(plainbuf, plaintext, sizeof(plaintext)) != 0) {
+        return -1;
+    } else { cout << "plaintext get success" << endl; }
+
+    printf("%s() ok\n", __FUNCTION__);
     return 1;
 }
 
@@ -314,6 +347,7 @@ int main1() {
 }
 
 int main() {
-    test_jacobian_point();
+//    test_jacobian_point();
+    test_sm2_do_encrypt();
     return 0;
 }

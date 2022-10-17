@@ -17,6 +17,12 @@ const base P = {0xffffffff, 0xffffffff, 0x00000000, 0xffffffff,
                 0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
 };
 
+const base N = {
+        0x39d54123, 0x53bbf409, 0x21c6052b, 0x7203df6b,
+        0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,
+};
+
+
 const base A = {0, 0, 0, 0, 0, 0, 0, 0};
 
 const base B = {
@@ -79,10 +85,10 @@ int jacobian_point_is_on_curve(const JACOBIAN_POINT *P);
 
 int jacobian_point_equ_hex(const JACOBIAN_POINT *P, const char hex[128]);
 
-int jacobian_point_print(FILE *fp, int fmt, int ind, const char *label, const JACOBIAN_POINT *P);
 
 #define jacobian_point_set_infinity(R) jacobian_point_init(R)
 #define jacobian_point_copy(R, P) memcpy((R), (P), sizeof(JACOBIAN_POINT))
+#define jacobian_point_mul_generator(R, K) jacobian_point_mul(R, K, &SM2_G)
 
 void fp_mul(base r, const base a, const base b) {
     base_mul_modn(r, a, b, P);
@@ -159,6 +165,13 @@ void jacobian_point_get_xy(const JACOBIAN_POINT *P, base x, base y) {
         if (y)
             fp_mul(y, y, z_inv);
     }
+}
+
+void jacobian_print_xy(const JACOBIAN_POINT *P) {
+    base x, y;
+    jacobian_point_get_xy(P, x, y);
+    base_print("x:", x);
+    base_print("y:", y);
 }
 
 int jacobian_point_is_on_curve(const JACOBIAN_POINT *P) {
@@ -362,9 +375,9 @@ void jacobian_point_from_bytes(JACOBIAN_POINT *P, const uint8_t in[64]) {
     /* should we check if jacobian_point_is_on_curve */
 }
 
-void jacobian_point_mul_generator(JACOBIAN_POINT *R, const base k) {
-    jacobian_point_mul(R, k, &SM2_G);
-}
+//void jacobian_point_mul_generator(JACOBIAN_POINT *R, const base k) {
+//    jacobian_point_mul(R, k, &SM2_G);
+//}
 
 /* R = t * P + s * G */
 void jacobian_point_mul_sum(JACOBIAN_POINT *R, const base t, const JACOBIAN_POINT *P, const base s) {
@@ -406,6 +419,13 @@ int jacobian_point_equ_hex(const JACOBIAN_POINT *P, const char hex[128]) {
 
     return (base_cmp(x, T->X) == 0) && (base_cmp(y, T->Y) == 0);
 }
+
+////-------以上是jacobian的坐标，下面是只有(x,y)的坐标-------
+
+typedef struct {
+    uint8_t x[32];
+    uint8_t y[32];
+} SM2_POINT;
 
 #endif //SM2DEMO_ELLIPSE_H
 

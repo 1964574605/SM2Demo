@@ -133,7 +133,6 @@ coordinate coordinate::add(coordinate point, base a, base p) {
     return ret;
 }
 
-
 coordinate coordinate::mulNum(base n, base a, base p) {
     char base_bits[257];
     base_to_bits(n, base_bits);

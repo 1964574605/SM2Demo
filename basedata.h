@@ -146,15 +146,11 @@ void base_set_word(base r, uint32_t a) {
 }
 
 int base_rand_range(base r, const base range) {
-    FILE *fp;
-    uint8_t buf[256];
-
-    fp = fopen("/dev/urandom", "rb");
+    string random_str;
     do {
-        fread(buf, 1, 256, fp);
-        base_from_bytes(r, buf);
+        random_str = getRandom(64);
+        if (base_from_hex(r, random_str.data()) == -1) { cout << "random生成失败" << endl; }
     } while (base_cmp(r, range) >= 0);
-    fclose(fp);
     return 1;
 }
 
